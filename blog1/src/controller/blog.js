@@ -1,3 +1,4 @@
+const xss = require('xss')
 const { exec } = require('../db/mysql')
 
 /**
@@ -7,16 +8,16 @@ const { exec } = require('../db/mysql')
  * @returns
  */
 const getList = (author, keyword) => {
-	let sql = `select id,title,content,createtime,author from blogs where 1=1 `
-	if (author) {
-		sql += `and author='${author}' `
-	}
-	if (keyword) {
-		sql += `and title like '%${keyword}%' `
-	}
-	sql += `order by createtime desc`
-	// 返回promise
-	return exec(sql)
+  let sql = `select id,title,content,createtime,author from blogs where 1=1 `
+  if (author) {
+    sql += `and author='${author}' `
+  }
+  if (keyword) {
+    sql += `and title like '%${keyword}%' `
+  }
+  sql += `order by createtime desc`
+  // 返回promise
+  return exec(sql)
 }
 
 /**
@@ -25,10 +26,10 @@ const getList = (author, keyword) => {
  * @returns
  */
 const getDetail = id => {
-	const sql = `select * from blogs where id=${id};`
-	return exec(sql).then(rows => {
-		return rows[0]
-	})
+  const sql = `select * from blogs where id=${id};`
+  return exec(sql).then(rows => {
+    return rows[0]
+  })
 }
 
 /**
@@ -37,21 +38,21 @@ const getDetail = id => {
  * @returns
  */
 const newBlog = blogData => {
-	const title = blogData.title
-	const content = blogData.content
-	const author = blogData.author
-	const createtime = Date.now()
+  const title = xss(blogData.title)
+  const content = xss(blogData.content)
+  const author = blogData.author
+  const createtime = Date.now()
 
-	const sql = `
+  const sql = `
 		insert into blogs (title,content,createtime,author) values 
 		('${title}','${content}',${createtime},'${author}');
 	`
 
-	return exec(sql).then(data => {
-		return {
-			id: data.insertId
-		}
-	})
+  return exec(sql).then(data => {
+    return {
+      id: data.insertId
+    }
+  })
 }
 
 /**
@@ -60,15 +61,15 @@ const newBlog = blogData => {
  * @returns
  */
 const updateBlog = blogData => {
-	const { id, title, content } = blogData
+  const { id, title, content } = blogData
 
-	const sql = `
+  const sql = `
 		update blogs set title='${title}',
 		content='${content}' where id=${id};
 	`
-	return exec(sql).then(data => {
-		return data.affectedRows > 0
-	})
+  return exec(sql).then(data => {
+    return data.affectedRows > 0
+  })
 }
 
 /**
@@ -77,18 +78,18 @@ const updateBlog = blogData => {
  * @returns
  */
 const deleteBlog = (id, author) => {
-	const sql = `
+  const sql = `
 		delete from blogs where id=${id} and author='${author}';
 	`
-	return exec(sql).then(data => {
-		return data.affectedRows > 0
-	})
+  return exec(sql).then(data => {
+    return data.affectedRows > 0
+  })
 }
 
 module.exports = {
-	getList,
-	getDetail,
-	newBlog,
-	updateBlog,
-	deleteBlog
+  getList,
+  getDetail,
+  newBlog,
+  updateBlog,
+  deleteBlog
 }
