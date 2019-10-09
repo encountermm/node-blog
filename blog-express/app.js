@@ -1,6 +1,7 @@
 var createError = require('http-errors')
 var express = require('express')
 var path = require('path')
+const fs = require('fs')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 const session = require('express-session')
@@ -15,7 +16,28 @@ var app = express()
 // app.set('views', path.join(__dirname, 'views'))
 // app.set('view engine', 'jade')
 
-app.use(logger('dev'))
+const ENV = process.env.NODE_ENV
+
+if (ENV === 'production') {
+  // 线上环境
+  const logFileName = path.join(__dirname, 'logs/access.log')
+  const writeStream = fs.createWriteStream(logFileName, {
+    flags: 'a'
+  })
+  app.use(
+    logger('combined', {
+      stream: writeStream
+    })
+  )
+} else {
+  // 开发环境 /测试环境
+  app.use(
+    logger('dev', {
+      stream: process.stdout
+    })
+  )
+}
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
@@ -26,9 +48,11 @@ const redisClient = require('./db/redis')
 const sessionStore = new RedisStore({
   client: redisClient
 })
-// 设置session
+// 设置 session
 app.use(
   session({
+    resave: false, //添加 resave 选项
+    saveUninitialized: true, //添加 saveUninitialized 选项
     secret: 'KIMI_20180326',
     cookie: {
       path: '/', //默认配置
