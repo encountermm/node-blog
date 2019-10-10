@@ -54,6 +54,7 @@ app.use(
     resave: false, //添加 resave 选项
     saveUninitialized: true, //添加 saveUninitialized 选项
     secret: 'KIMI_20180326',
+    // 配置cookie
     cookie: {
       path: '/', //默认配置
       httpOnly: true, //默认配置

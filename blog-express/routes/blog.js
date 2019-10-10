@@ -47,7 +47,7 @@ router.post('/delete', loginCheck, (req, res, next) => {
     if (data) {
       res.json(new SuccessModal())
     } else {
-      res.json(new new ErrorModal('删除失败')())
+      res.json(new ErrorModal('删除失败'))
     }
   })
 })
