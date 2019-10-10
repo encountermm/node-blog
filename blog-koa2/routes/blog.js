@@ -20,7 +20,7 @@ router.get('/list', async (ctx, next) => {
       return
     }
     // 强制查询自己的博客
-    author = req.session.username
+    author = ctx.session.username
   }
 
   const listData = await getList(author, keyword)
@@ -42,7 +42,7 @@ router.post('/new', loginCheck, async (ctx, next) => {
 
 // update
 router.post('/update', loginCheck, async (ctx, next) => {
-  const data = await updateBlog(req.request.body)
+  const data = await updateBlog(ctx.request.body)
   if (data) {
     ctx.body = new SuccessModal()
   } else {
